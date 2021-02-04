@@ -1,24 +1,30 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState } from "react";
+import qs from "qs";
+import AdapterDateFns from "@material-ui/lab/AdapterDateFns";
+import LocalizationProvider from "@material-ui/lab/LocalizationProvider";
+
+import { Filters } from "./components/filters/filters";
+import { Records } from "./components/records/records";
+import api from "./lib/api";
 
 function App() {
+  const [records, setRecords] = useState([]);
+
+  const fetchRecords = async (filters = {}) => {
+    const { data: records } = await api.get(`/?${qs.stringify(filters)}`);
+
+    setRecords(records);
+  };
+
+  const handleSubmit = (filters) => {
+    fetchRecords(filters);
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <Filters onSubmit={handleSubmit} />
+      <Records records={records} />
+    </LocalizationProvider>
   );
 }
 
